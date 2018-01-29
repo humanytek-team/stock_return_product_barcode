@@ -12,8 +12,10 @@
     'depends': [
         'stock',
         'stock_warehouse_returns',
+        'sale_stock_restrict_return_picking_expiration_time',
     ],
     'data': [
+        'views/stock_warehouse_return_view.xml',
     ],
     'installable': True,
     'auto_install': False

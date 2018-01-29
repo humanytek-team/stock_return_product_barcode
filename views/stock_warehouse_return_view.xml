@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <record id="stock_warehouse_return_form_inherit" model="ir.ui.view">
+            <field name="name">stock.warehouse.return.form.inherit</field>
+            <field name="model">stock.warehouse.return</field>
+            <field name="inherit_id" ref="stock_warehouse_returns.stock_warehouse_return_form" />
+            <field name="arch" type="xml">
+
+              <xpath expr="//div" position="after">
+                <group>
+                  <group>
+                    <field name="return_location_id"/>
+                    <field name="expired"/>
+                  </group>
+                </group>
+              </xpath>
+
+            </field>
+        </record>
+
+    </data>
+</openerp>
