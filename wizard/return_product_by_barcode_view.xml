@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+
+    <record id="return_product_barcode_form" model="ir.ui.view">
+      <field name="name">return.product.barcode.form</field>
+      <field name="model">return.product.barcode</field>
+      <field name="arch" type="xml">
+        <form>
+
+          <sheet>
+
+            <p class="oe_grey">
+       	      This wizard lets return several units of a product indicating its barcode
+       	    </p>
+
+            <field name="product_image_medium" widget="image" class="oe_avatar"/>
+
+            <div class="oe_title">
+              <label class="oe_edit_only" for="customer_id" string="Customer"/>
+              <h1><field name="customer_id" /></h1>
+              <label class="oe_edit_only" for="product_barcode" string="Barcode"/>
+              <h1><field name="product_barcode" /></h1>
+            </div>
+
+            <group string="Attributes">
+              <field name="product_attribute_value_ids" widget="many2many_tags"/>
+            </group>
+
+            <group>
+
+              <group name="codes" string="Product">
+                <field name="product_id"/>
+                <field name="product_default_code"/>
+              </group>
+
+              <group name="weight">
+
+                <group name="weight" string="Weights">
+                  <label for="product_volume"/> 
+                  <div class="o_row">
+                    <field digits="(14, 3)" name="product_volume"/>
+                    <span>m³</span>
+                  </div>
+                  <label for="product_weight"/>
+                  <div class="o_row">
+                    <field name="product_weight"/>
+                    <span>kg</span>
+                  </div>
+                </group>
+
+              </group>
+              
+            </group>
+
+            <separator string="Quantity by reason" />
+            <group>
+              <field name="return_reason_qty_ids" nolabel="1" domain="[('reason_return_id.expired', '=', False)]" >
+                <tree editable="inline">
+                  <field name="reason_return_id" />
+                  <field name="qty" />
+                </tree>
+              </field>
+            </group>
+
+            <footer>
+
+      	      <button
+                  string="Return product"
+                  name="return_product"
+                  type="object"
+                  default_focus="1"
+                  class="oe_highlight"/>
+
+      	      <button string="Cancel" class="oe_link" special="cancel"/>
+      	    </footer>
+
+          </sheet>
+
+        </form>
+
+      </field>
+
+    </record>
+
+    <record model="ir.actions.act_window" id="action_return_product_barcode">
+        <field name="name">Return product by barcode</field>
+        <field name="res_model">return.product.barcode</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem
+        name="Return product by barcode"
+        id="menu_return_product_barcode"
+        action="action_return_product_barcode"
+        parent="stock.menu_stock_inventory_control"/>
+
+  </data>
+</openerp>

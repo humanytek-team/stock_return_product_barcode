@@ -12,3 +12,12 @@ class StockWarehouseReturn(models.Model):
         'stock.location', 'Return Location', ondelete='restrict')
 
     expired = fields.Boolean('Time Expired')
+    category_id = fields.Many2one(
+        'stock.warehouse.return.category', 'Category', required=True)
+
+
+class StockWarehouseReturnCategory(models.Model):
+    _name = 'stock.warehouse.return.category'
+
+    name = fields.Char('Category')
+    active = fields.Boolean('Active ?', default=True)
