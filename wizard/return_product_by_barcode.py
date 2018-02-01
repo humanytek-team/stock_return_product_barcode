@@ -3,6 +3,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html)
 
 from datetime import datetime, timedelta
+import hashlib
 
 from openerp import api, fields, models, _
 from openerp.exceptions import ValidationError
@@ -24,6 +25,16 @@ class ReturnProductBarcode(models.TransientModel):
         _logger.debug('DEBUG VALID DATE RETURNS %s', valid_date)
         return valid_date
 
+    def _compute_wizard_hash(self):
+        """Computes default value of field wizard hash"""
+
+        wizard_hash = hashlib.md5(
+            str(self.id) +
+            datetime.now().strftime('%Y-%m-%d %H:%M:%S %f')
+        ).hexdigest()
+
+        return wizard_hash
+
     customer_id = fields.Many2one('res.partner', 'Customer', domain=[
                                   ('customer', '=', True)])
     product_id = fields.Many2one('product.product', 'Product', readonly=True)
@@ -44,6 +55,7 @@ class ReturnProductBarcode(models.TransientModel):
         'wizard_id',
         'Quantity by reason',
         required=True)
+    wizard_hash = fields.Char('Wizard hash', default=_compute_wizard_hash)
 
     @api.onchange('product_barcode')
     def onchange_product_barcode(self):
@@ -57,6 +69,43 @@ class ReturnProductBarcode(models.TransientModel):
             if product:
                 self.product_id = product[0]
                 self.product_barcode = False
+
+                return_reason_qty_ids = list()
+                ReturnReasonProductQty = self.env['return.reason.product.qty']
+                return_reason_product_lines = ReturnReasonProductQty.search([
+                    ('wizard_hash', '=', self.wizard_hash),
+                ])
+
+                for return_reason_unit in return_reason_product_lines:
+
+                    return_reason_qty_ids.append(
+                        (0, 0, {
+                            'product_id': return_reason_unit.product_id.id,
+                            'product_uom_qty': return_reason_unit.product_uom_qty,
+                            'reason_return_id': return_reason_unit.reason_return_id,
+                            'wizard_hash': return_reason_unit.wizard_hash,
+                            'record_hash': return_reason_unit.record_hash,
+                        })
+                    )
+
+                return_reason_unit_hash = hashlib.md5(
+                    self.wizard_hash +
+                    datetime.now().strftime('%Y-%m-%d %H:%M:%S %f') +
+                    str(self.product_id.id)
+                ).hexdigest()
+
+                return_reason_unit_data = {
+                    'product_id': self.product_id.id,
+                    'product_uom_qty': 1,
+                    'wizard_hash': self.wizard_hash,
+                    'record_hash': return_reason_unit_hash,
+                }
+
+                ReturnReasonProductQty.create(return_reason_unit_data)
+
+                return_reason_qty_ids.append(
+                    (0, 0, return_reason_unit_data))
+                self.return_reason_qty_ids = return_reason_qty_ids
 
             else:
                 raise ValidationError(
@@ -148,5 +197,29 @@ class ReturnProductReasonUnit(models.TransientModel):
     wizard_id = fields.Many2one(
         'return.product.barcode', 'Wizard', required=True)
     reason_return_id = fields.Many2one(
-        'stock.warehouse.return', 'Return Reason', required=True)
-    qty = fields.Float('Quantity', required=True, default=1)
+        'stock.warehouse.return', 'Return Reason')
+    return_location_id = fields.Many2one(
+        related='reason_return_id.return_location_id', readonly=True)
+    product_id = fields.Many2one('product.product', 'Product', readonly=True)
+    product_uom_qty = fields.Float(
+        'Quantity', required=True, default=1, readonly=True)
+    product_attribute_value_ids = fields.Many2many(
+        related='product_id.attribute_value_ids', readonly=True)
+    product_default_code = fields.Char(
+        related='product_id.default_code', readonly=True)
+    wizard_hash = fields.Char('Wizard hash', required=True)
+    record_hash = fields.Char('Record hash', required=True)
+
+    @api.onchange('reason_return_id')
+    def onchange_reason_return_id(self):
+
+        ReturnReasonProductQty = self.env['return.reason.product.qty']
+
+        return_reason_product_rec = ReturnReasonProductQty.search([
+            ('wizard_hash', '=', self.wizard_hash),
+            ('record_hash', '=', self.record_hash),
+        ])
+
+        if return_reason_product_rec:
+            return_reason_product_rec.write({
+                'reason_return_id': self.reason_return_id.id})
