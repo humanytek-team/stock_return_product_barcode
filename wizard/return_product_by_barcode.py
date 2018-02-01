@@ -190,6 +190,7 @@ class ReturnProductBarcode(models.TransientModel):
                 ).hexdigest()
 
                 picking = self._get_picking(self.customer_id, product)
+                reason_return_id = False
 
                 if picking:
 
@@ -199,13 +200,23 @@ class ReturnProductBarcode(models.TransientModel):
                 else:
                     sale_product_price = False
 
+                    StockWarehouseReturn = self.env['stock.warehouse.return']
+                    expired_reason_return = StockWarehouseReturn.search([
+                        ('expired', '=', True),
+                    ])
+
+                    if expired_reason_return:
+                        reason_return_id = expired_reason_return[0].id
+
                 return_reason_unit_data = {
                     'product_id': self.product_id.id,
                     'product_uom_qty': 1,
                     'wizard_hash': self.wizard_hash,
                     'record_hash': return_reason_unit_hash,
                     'picking_id': picking and picking.id,
-                    'sale_product_price': sale_product_price}
+                    'sale_product_price': sale_product_price,
+                    'reason_return_id': reason_return_id,
+                }
 
                 ReturnReasonProductQty.create(return_reason_unit_data)
 
@@ -307,6 +318,7 @@ class ReturnProductReasonUnit(models.TransientModel):
         'stock.warehouse.return', 'Return Reason')
     reason_return_cat_type = fields.Selection(
         related='reason_return_id.category_type')
+    reason_return_expired = fields.Boolean(related='reason_return_id.expired')
     return_location_id = fields.Many2one(
         related='reason_return_id.return_location_id', readonly=True)
     product_id = fields.Many2one('product.product', 'Product', readonly=True)
