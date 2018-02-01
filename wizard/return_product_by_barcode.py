@@ -133,6 +133,21 @@ class ReturnProductBarcode(models.TransientModel):
 
         return False
 
+    @api.model
+    def _get_sale_product_price(self, sale_order, product):
+        """Returns unit price of product in sale order"""
+
+        line_product = sale_order.order_line.filtered(
+            lambda line: line.product_id.id == product.id)
+
+        product_price = line_product[0].price_unit
+
+        for tax in line_product.tax_id:
+
+            product_price += tax.amount * line_product[0].price_unit / 100
+
+        return product_price
+
     @api.onchange('product_barcode')
     def onchange_product_barcode(self):
 
@@ -163,6 +178,8 @@ class ReturnProductBarcode(models.TransientModel):
                             'record_hash': return_reason_unit.record_hash,
                             'picking_id': return_reason_unit.picking_id and
                             return_reason_unit.picking_id.id,
+                            'sale_product_price':
+                            return_reason_unit.sale_product_price,
                         })
                     )
 
@@ -174,13 +191,21 @@ class ReturnProductBarcode(models.TransientModel):
 
                 picking = self._get_picking(self.customer_id, product)
 
+                if picking:
+
+                    sale_product_price = self._get_sale_product_price(
+                        picking.sale_id, product)
+
+                else:
+                    sale_product_price = False
+
                 return_reason_unit_data = {
                     'product_id': self.product_id.id,
                     'product_uom_qty': 1,
                     'wizard_hash': self.wizard_hash,
                     'record_hash': return_reason_unit_hash,
                     'picking_id': picking and picking.id,
-                }
+                    'sale_product_price': sale_product_price}
 
                 ReturnReasonProductQty.create(return_reason_unit_data)
 
