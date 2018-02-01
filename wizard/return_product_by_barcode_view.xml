@@ -60,6 +60,9 @@
                   <field name="product_default_code" />
                   <field name="product_attribute_value_ids" />
                   <field name="product_uom_qty" />
+                  <field name="sale_id" />
+                  <field name="sale_date_order" />
+                  <field name="sale_product_price" />
                   <field name="reason_return_id" />
                   <field name="return_location_id" />
                   <!-- Hidden fields -->

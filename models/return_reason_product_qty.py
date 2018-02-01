@@ -3,6 +3,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html)
 
 from openerp import fields, models
+import openerp.addons.decimal_precision as dp
 
 
 class ReturnReasonProductQty(models.Model):
@@ -21,3 +22,10 @@ class ReturnReasonProductQty(models.Model):
         related='product_id.default_code', readonly=True)
     wizard_hash = fields.Char('Wizard hash')
     record_hash = fields.Char('Record hash')
+    picking_id = fields.Many2one('stock.picking', 'Transfer')
+    sale_id = fields.Many2one(related='picking_id.sale_id')
+    sale_date_order = fields.Datetime(related='sale_id.date_order')
+    sale_product_price = fields.Float(
+        'Amount', digits=dp.get_precision('Product Price'), default=0.0)
+    completed = fields.Boolean(
+        'Completed ?', help='Technical field', default=False)

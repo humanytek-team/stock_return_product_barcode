@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 import hashlib
 
 from openerp import api, fields, models, _
+import openerp.addons.decimal_precision as dp
 from openerp.exceptions import ValidationError
 import logging
 _logger = logging.getLogger(__name__)
@@ -57,6 +58,81 @@ class ReturnProductBarcode(models.TransientModel):
         required=True)
     wizard_hash = fields.Char('Wizard hash', default=_compute_wizard_hash)
 
+    @api.model
+    def _get_picking(self, customer, product):
+        """Returns stock picking"""
+
+        # TODO: Add support for when quantity of product to return be greater
+        # than one (1).
+        customer.ensure_one()
+        product.ensure_one()
+
+        StockPicking = self.env['stock.picking']
+        _logger.debug('DEBUG ERROR DATETIME BEFORE')
+        pickings = StockPicking.search([
+            ('company_id', '=', self.env.user.company_id.id),
+            ('partner_id', '=', customer.id),
+            ('sale_id.date_order', '>=', self._get_valid_date()),
+            ('move_lines_related.product_id', '=', product.id),
+            ('picking_type_code', '=', 'outgoing'),
+            ('sale_id.state', 'in', ['sale', 'done']),
+            ('state', '=', 'done'),
+        ], order='min_date')
+        _logger.debug('DEBUG ERROR DATETIME AFTER %s', pickings)
+        if pickings:
+
+            for picking in pickings:
+
+                pickings_childs_returned = StockPicking.search([
+                    ('origin', '=', picking.name),
+                    ('move_lines_related.product_id', '=', product.id),
+                    ('state', '=', 'done'),
+                    ('picking_type_code', '=', 'incoming'),
+                ])
+
+                pck_moves_product = picking.move_lines_related.filtered(
+                    lambda move: move.product_id.id == product.id
+                    and move.state == 'done')
+
+                pck_product_qty_total = sum(
+                    pck_moves_product.mapped('product_uom_qty'))
+
+                ReturnReasonProductQty = self.env['return.reason.product.qty']
+                # TODO: no more than one instance of the wizard is being considered simultaneously.
+                # Fix this.
+                picking_taken = ReturnReasonProductQty.search([
+                    ('wizard_hash', '=', self.wizard_hash),
+                    ('product_id', '=', product.id),
+                    ('picking_id', '=', picking.id),
+                    ('completed', '=', False),
+                ])
+
+                if not pickings_childs_returned:
+
+                    if len(picking_taken) < pck_product_qty_total:
+                        return picking
+
+                else:
+
+                    pck_returned_moves_with_product = \
+                        pickings_childs_returned.move_lines_related.filtered(
+                            lambda move: move.product_id.id == product.id and
+                            move.state == 'done'
+                        )
+
+                    pickings_returned_product_qty_total = sum(
+                        pck_returned_moves_with_product.mapped(
+                            'product_uom_qty')
+                    )
+
+                    if (pickings_returned_product_qty_total +
+                        len(picking_taken)) < \
+                       pck_product_qty_total:
+
+                        return picking
+
+        return False
+
     @api.onchange('product_barcode')
     def onchange_product_barcode(self):
 
@@ -82,9 +158,11 @@ class ReturnProductBarcode(models.TransientModel):
                         (0, 0, {
                             'product_id': return_reason_unit.product_id.id,
                             'product_uom_qty': return_reason_unit.product_uom_qty,
-                            'reason_return_id': return_reason_unit.reason_return_id,
+                            'reason_return_id': return_reason_unit.reason_return_id.id,
                             'wizard_hash': return_reason_unit.wizard_hash,
                             'record_hash': return_reason_unit.record_hash,
+                            'picking_id': return_reason_unit.picking_id and
+                            return_reason_unit.picking_id.id,
                         })
                     )
 
@@ -94,11 +172,14 @@ class ReturnProductBarcode(models.TransientModel):
                     str(self.product_id.id)
                 ).hexdigest()
 
+                picking = self._get_picking(self.customer_id, product)
+
                 return_reason_unit_data = {
                     'product_id': self.product_id.id,
                     'product_uom_qty': 1,
                     'wizard_hash': self.wizard_hash,
                     'record_hash': return_reason_unit_hash,
+                    'picking_id': picking and picking.id,
                 }
 
                 ReturnReasonProductQty.create(return_reason_unit_data)
@@ -116,6 +197,7 @@ class ReturnProductBarcode(models.TransientModel):
         """Proccess returns of product"""
 
         self.ensure_one()
+        # TODO: Mark as completed the records in return.reason.product.qty
 
         wizard = self
         product = wizard.product_id
@@ -209,6 +291,11 @@ class ReturnProductReasonUnit(models.TransientModel):
         related='product_id.default_code', readonly=True)
     wizard_hash = fields.Char('Wizard hash', required=True)
     record_hash = fields.Char('Record hash', required=True)
+    picking_id = fields.Many2one('stock.picking', 'Transfer')
+    sale_id = fields.Many2one(related='picking_id.sale_id')
+    sale_date_order = fields.Datetime(related='sale_id.date_order')
+    sale_product_price = fields.Float(
+        'Amount', digits=dp.get_precision('Product Price'), default=0.0)
 
     @api.onchange('reason_return_id')
     def onchange_reason_return_id(self):
