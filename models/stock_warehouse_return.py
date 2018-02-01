@@ -14,6 +14,7 @@ class StockWarehouseReturn(models.Model):
     expired = fields.Boolean('Time Expired')
     category_id = fields.Many2one(
         'stock.warehouse.return.category', 'Category', required=True)
+    category_type = fields.Selection(related='category_id.type')
 
 
 class StockWarehouseReturnCategory(models.Model):
@@ -21,3 +22,8 @@ class StockWarehouseReturnCategory(models.Model):
 
     name = fields.Char('Category')
     active = fields.Boolean('Active ?', default=True)
+    type = fields.Selection([
+        ('accepted', 'Accepted'),
+        ('no_accepted', 'No Accepted'),
+        ('return_supplier', 'Return to Supplier'),
+    ], 'Type of Category', required=True)

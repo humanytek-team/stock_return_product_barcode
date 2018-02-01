@@ -55,8 +55,12 @@
 
             <separator string="Quantity by reason" />
             <group>
-              <field name="return_reason_qty_ids" nolabel="1" domain="[('reason_return_id.expired', '=', False)]" >
-                <tree editable="inline">
+              <field
+                  name="return_reason_qty_ids"
+                  nolabel="1"
+                  domain="[('reason_return_id.expired', '=', False)]">
+                
+                <tree editable="inline" create="false" delete="false">
                   <field name="product_default_code" />
                   <field name="product_attribute_value_ids" />
                   <field name="product_uom_qty" />
@@ -65,9 +69,14 @@
                   <field name="sale_product_price" />
                   <field name="reason_return_id" />
                   <field name="return_location_id" />
+                  <field
+                      name="picking_purchase_name"
+                      attrs="{'readonly': [('reason_return_cat_type', '!=', 'return_supplier')]}" />
+
                   <!-- Hidden fields -->
                   <field name="wizard_hash" invisible="1" />
                   <field name="record_hash" invisible="1" />
+                  <field name="reason_return_cat_type" invisible="1" />
                 </tree>
               </field>
             </group>

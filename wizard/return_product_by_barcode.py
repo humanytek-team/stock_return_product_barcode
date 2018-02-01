@@ -305,6 +305,8 @@ class ReturnProductReasonUnit(models.TransientModel):
         'return.product.barcode', 'Wizard', required=True)
     reason_return_id = fields.Many2one(
         'stock.warehouse.return', 'Return Reason')
+    reason_return_cat_type = fields.Selection(
+        related='reason_return_id.category_type')
     return_location_id = fields.Many2one(
         related='reason_return_id.return_location_id', readonly=True)
     product_id = fields.Many2one('product.product', 'Product', readonly=True)
@@ -321,6 +323,7 @@ class ReturnProductReasonUnit(models.TransientModel):
     sale_date_order = fields.Datetime(related='sale_id.date_order')
     sale_product_price = fields.Float(
         'Amount', digits=dp.get_precision('Product Price'), default=0.0)
+    picking_purchase_name = fields.Char('Picking Name of Purchase')
 
     @api.onchange('reason_return_id')
     def onchange_reason_return_id(self):

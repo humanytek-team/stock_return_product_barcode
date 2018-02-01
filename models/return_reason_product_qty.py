@@ -29,3 +29,4 @@ class ReturnReasonProductQty(models.Model):
         'Amount', digits=dp.get_precision('Product Price'), default=0.0)
     completed = fields.Boolean(
         'Completed ?', help='Technical field', default=False)
+    picking_purchase_name = fields.Char('Picking Name of Purchase')

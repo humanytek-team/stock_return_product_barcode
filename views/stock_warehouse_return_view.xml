@@ -46,9 +46,14 @@
                             <label string="Category" />
                             <h1>
                                 <field name="name"/>
-                            </h1>
+                            </h1>                            
                             <label string="Active" />
                             <field name="active" />
+                            <group>
+                              <group>
+                                <field name="type" />
+                              </group>
+                            </group>
                         </div>
 
                     </sheet>
