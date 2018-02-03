@@ -30,3 +30,4 @@ class ReturnReasonProductQty(models.Model):
     completed = fields.Boolean(
         'Completed ?', help='Technical field', default=False)
     picking_purchase_name = fields.Char('Picking Name of Purchase')
+    picking_move_id = fields.Many2one('stock.move', 'Move of product')

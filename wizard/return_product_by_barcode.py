@@ -7,7 +7,7 @@ import hashlib
 
 from openerp import api, fields, models, _
 import openerp.addons.decimal_precision as dp
-from openerp.exceptions import ValidationError
+from openerp.exceptions import UserError, ValidationError
 import logging
 _logger = logging.getLogger(__name__)
 
@@ -61,9 +61,7 @@ class ReturnProductBarcode(models.TransientModel):
     @api.model
     def _get_picking(self, customer, product):
         """Returns stock picking"""
-
-        # TODO: Add support for when quantity of product to return be greater
-        # than one (1).
+        _logger.debug('DEBUG GET PICKING PRODUCT %s', product)
         customer.ensure_one()
         product.ensure_one()
 
@@ -89,14 +87,17 @@ class ReturnProductBarcode(models.TransientModel):
                     ('state', '=', 'done'),
                     ('picking_type_code', '=', 'incoming'),
                 ])
-
+                _logger.debug(
+                    'DEBUG ERROR PICKINGGGG pickings_childs_returned %s', pickings_childs_returned)
                 pck_moves_product = picking.move_lines_related.filtered(
                     lambda move: move.product_id.id == product.id
                     and move.state == 'done')
-
+                _logger.debug(
+                    'DEBUG ERROR PICKINGGGG pck_moves_product %s', pck_moves_product)
                 pck_product_qty_total = sum(
                     pck_moves_product.mapped('product_uom_qty'))
-
+                _logger.debug(
+                    'DEBUG ERROR PICKINGGGG pck_product_qty_total %s', pck_product_qty_total)
                 ReturnReasonProductQty = self.env['return.reason.product.qty']
                 # TODO: no more than one instance of the wizard is being considered simultaneously.
                 # Fix this.
@@ -106,31 +107,41 @@ class ReturnProductBarcode(models.TransientModel):
                     ('picking_id', '=', picking.id),
                     ('completed', '=', False),
                 ])
-
+                _logger.debug(
+                    'DEBUG ERROR PICKINGGGG picking_taken %s', picking_taken)
                 if not pickings_childs_returned:
 
                     if len(picking_taken) < pck_product_qty_total:
+                        _logger.debug(
+                            'DEBUG ERROR PICKINGGGG WITHOUT RETURNS %s', picking)
                         return picking
 
                 else:
 
+                    _logger.debug(
+                        'DEBUG ERROR PICKINGGGG WITH RETURNS %s', picking)
+                    _logger.debug(
+                        'DEBUG ERROR PICKINGGGG TEST FILTERED %s', pickings_childs_returned[0].move_lines_related)
                     pck_returned_moves_with_product = \
-                        pickings_childs_returned.move_lines_related.filtered(
+                        pickings_childs_returned.mapped('move_lines_related').filtered(
                             lambda move: move.product_id.id == product.id and
                             move.state == 'done'
                         )
-
+                    _logger.debug(
+                        'DEBUG ERROR PICKINGGGG WITH RETURNS pck_returned_moves_with_product %s', pck_returned_moves_with_product)
                     pickings_returned_product_qty_total = sum(
                         pck_returned_moves_with_product.mapped(
                             'product_uom_qty')
                     )
-
+                    _logger.debug(
+                        'DEBUG ERROR PICKINGGGG WITH RETURNS pickings_returned_product_qty_total %s', pickings_returned_product_qty_total)
                     if (pickings_returned_product_qty_total +
                         len(picking_taken)) < \
                        pck_product_qty_total:
 
+                        _logger.debug(
+                            'DEBUG ERROR PICKINGGGG WITH RETURNS %s', picking)
                         return picking
-
         return False
 
     @api.model
@@ -142,11 +153,21 @@ class ReturnProductBarcode(models.TransientModel):
 
         product_price = line_product[0].price_unit
 
-        for tax in line_product.tax_id:
+        for tax in line_product[0].tax_id:
 
             product_price += tax.amount * line_product[0].price_unit / 100
 
         return product_price
+
+    @api.model
+    def _get_move_product(self, picking, product):
+        """Returns the move of product in the picking"""
+
+        picking_product_moves = picking.move_lines.filtered(
+            lambda move: not move.scrapped and
+            move.product_id.id == product.id)
+
+        return picking_product_moves[0]
 
     @api.onchange('product_barcode')
     def onchange_product_barcode(self):
@@ -180,6 +201,8 @@ class ReturnProductBarcode(models.TransientModel):
                             return_reason_unit.picking_id.id,
                             'sale_product_price':
                             return_reason_unit.sale_product_price,
+                            'picking_move_id':
+                            return_reason_unit.picking_move_id,
                         })
                     )
 
@@ -191,15 +214,20 @@ class ReturnProductBarcode(models.TransientModel):
 
                 picking = self._get_picking(self.customer_id, product)
                 reason_return_id = False
-
+                _logger.debug('DEBUG PICKING %s', picking)
                 if picking:
 
                     sale_product_price = self._get_sale_product_price(
                         picking.sale_id, product)
-
+                    _logger.debug('DEBUG IF PICKING %s', sale_product_price)
+                    picking_move = self._get_move_product(
+                        picking, product)
+                    _logger.debug('DEBUG IF PICKING %s', picking_move)
+                    picking_move_id = picking_move and picking_move.id
+                    _logger.debug('DEBUG MOVE %s', picking_move_id)
                 else:
                     sale_product_price = False
-
+                    picking_move_id = False
                     StockWarehouseReturn = self.env['stock.warehouse.return']
                     expired_reason_return = StockWarehouseReturn.search([
                         ('expired', '=', True),
@@ -207,7 +235,7 @@ class ReturnProductBarcode(models.TransientModel):
 
                     if expired_reason_return:
                         reason_return_id = expired_reason_return[0].id
-
+                _logger.debug('DEBUG PICKING IN ONCHANGE %s', picking)
                 return_reason_unit_data = {
                     'product_id': self.product_id.id,
                     'product_uom_qty': 1,
@@ -216,6 +244,7 @@ class ReturnProductBarcode(models.TransientModel):
                     'picking_id': picking and picking.id,
                     'sale_product_price': sale_product_price,
                     'reason_return_id': reason_return_id,
+                    'picking_move_id': picking_move_id,
                 }
 
                 ReturnReasonProductQty.create(return_reason_unit_data)
@@ -228,85 +257,144 @@ class ReturnProductBarcode(models.TransientModel):
                 raise ValidationError(
                     _('There is no product with that barcode.'))
 
-    @api.multi
-    def return_product_by_barcode(self):
-        """Proccess returns of product"""
-
+    @api.model
+    def _do_transfer_return(self, picking):
         self.ensure_one()
-        # TODO: Mark as completed the records in return.reason.product.qty
+        for pack in picking.pack_operation_ids:
+            if pack.product_qty > 0:
+                pack.write({'qty_done': pack.product_qty})
+            else:
+                pack.unlink()
+        picking.do_transfer()
 
-        wizard = self
-        product = wizard.product_id
+    @api.model
+    def _create_return(self, line_return, return_supplier=False):
+        """Returns picking of return of product."""
 
-        if wizard.return_reason_qty_ids:
+        _logger.debug('DEBUG PICKING %s', line_return.picking_id)
+        if line_return.reason_return_cat_type != 'return_supplier' or \
+           not return_supplier:
+            picking = line_return.picking_id
+            pick_type_id = line_return.reason_return_id.return_picking_type_id.id
+            location_dest_id = line_return.return_location_id.id
+            move = line_return.picking_move_id
 
+        elif return_supplier:
             StockPicking = self.env['stock.picking']
+            picking = StockPicking.search([
+                ('name', '=', line_return.picking_purchase_name),
+            ])
+            if not picking:
+                raise UserError('The picking receipt %s indicated in product %s does not exist.',
+                                line_return.picking_purchase_name, line_return.product_id.name)
+            pick_type_id = line_return.reason_return_id.supplier_return_picking_type_id.id
+            location_dest_id = line_return.reason_return_id.supplier_return_location_id.id
 
-            pickings = StockPicking.search([
-                ('company_id', '=', self.env.user.company_id.id),
-                ('partner_id', '=', wizard.customer_id.id),
-                ('sale_id.date_order', '>=', self._get_valid_date),
-                ('move_lines_related.product_id', '=', product.id),
-                ('picking_type_code', '=', 'outgoing'),
-                ('sale_id.state', 'in', ['sale', 'done']),
-            ], order='min_date')
+            picking_move = self._get_move_product(
+                picking, line_return.product_id)
+            move = picking_move and picking_move.id
 
-            _logger.debug('DEBUG PICKINGS %s', pickings)
-            if pickings:
+        if picking.state != 'done':
+            raise UserError(
+                _("You may only return pickings that are Done!"))
 
-                pickings_to_return = list()
-                product_qty_return_by_picking = dict()
+        StockMove = self.env['stock.move']
 
-                for picking in pickings:
+        # Cancel assignment of existing chained assigned moves
+        moves_to_unreserve = []
+        for move in picking.move_lines:
+            to_check_moves = [
+                move.move_dest_id] if move.move_dest_id.id else []
+            while to_check_moves:
+                current_move = to_check_moves.pop()
+                if current_move.state not in ('done', 'cancel') and \
+                   current_move.reserved_quant_ids:
 
-                    pickings_childs = StockPicking.search([
-                        ('origin', '=', picking.name),
-                        ('move_lines_related.product_id', '=', product.id),
-                        ('state', '=', 'done'),
-                    ])
+                    moves_to_unreserve.append(current_move.id)
 
-                    pickings_returned = pickings_childs.filtered(
-                        lambda pck: pck.location_dest_return_location or
-                        pck.location_dest_id.usage == 'internal'
-                    )
+                split_move_ids = StockMove.search([
+                    ('split_from', '=', current_move.id),
+                ])
+                if split_move_ids:
+                    to_check_moves += split_move_ids
 
-                    pck_moves_product = picking.move_lines_related.filtered(
-                        lambda move: move.product_id.id == product.id
-                        and move.state == 'done')
+        if moves_to_unreserve:
+            StockMove.do_unreserve(moves_to_unreserve)
+            # break the link between moves in order to be able to fix them
+            # later if needed
+            StockMove.browse(moves_to_unreserve).write({
+                'move_orig_ids': False})
 
-                    pck_product_qty_total = sum(
-                        pck_moves_product.mapped('product_uom_qty'))
+        # Create new picking for returned product
+        new_picking = picking.copy({
+            'move_lines': [],
+            'picking_type_id': pick_type_id,
+            'state': 'draft',
+            'origin': picking.name,
+            'location_id': picking.location_dest_id.id,
+            'location_dest_id': location_dest_id,
+        })
 
-                    if not pickings_returned:
+        # The return of a return should be linked with the original's
+        # destination move if it was not cancelled
+        if move.origin_returned_move_id.move_dest_id.id and \
+           move.origin_returned_move_id.move_dest_id.state != 'cancel':
 
-                        pickings_to_return.append(picking)
-                        product_qty_return_by_picking[
-                            str(picking.id)] = pck_product_qty_total
+            move_dest_id = move.origin_returned_move_id.move_dest_id.id
+        else:
+            move_dest_id = False
 
-                    else:
+        new_picking_move = move.copy({
+            'product_id': line_return.product_id.id,
+            'product_uom_qty': line_return.product_uom_qty,
+            'picking_id': new_picking.id,
+            'state': 'draft',
+            'location_id': move.location_dest_id.id,
+            'location_dest_id': location_dest_id,
+            'picking_type_id': pick_type_id,
+            'warehouse_id': picking.picking_type_id.warehouse_id.id,
+            'origin_returned_move_id': move.id,
+            'procure_method': 'make_to_stock',
+            'move_dest_id': move_dest_id,
+        })
+        _logger.debug('DEBUG RETURN PICKING %s', new_picking)
+        _logger.debug('DEBUG RETURN PICKING MOVE LINES %s',
+                      new_picking.move_lines)
+        _logger.debug('DEBUG MOVE COPY %s',
+                      new_picking_move)
+        new_picking.action_confirm()
+        new_picking.action_assign()
+        self._do_transfer_return(new_picking)
+        return new_picking
 
-                        pck_returned_moves_with_product = pickings_returned.move_lines_related.filtered(
-                            lambda move: move.product_id.id == product.id and
-                            move.state == 'done'
-                        )
+    @api.multi
+    def return_product(self):
+        """Proccess returns of product"""
+        _logger.debug('DEBUG RETURN PRODUCT %s', self.return_reason_qty_ids)
+        self.ensure_one()
 
-                        pickings_returned_product_qty_total = sum(
-                            pck_returned_moves_with_product.mapped(
-                                'product_uom_qty')
-                        )
+        for line_return in self.return_reason_qty_ids:
 
-                        if pickings_returned_product_qty_total < pck_product_qty_total:
+            _logger.debug('DEBUG LINE RETURN %s', line_return)
+            _logger.debug('DEBUG LINE RETURN %s', line_return.picking_id)
 
-                            pickings_to_return.append(picking)
-                            product_qty = pck_product_qty_total - \
-                                pickings_returned_product_qty_total
-                            product_qty_return_by_picking[
-                                str(picking.id)] = product_qty
+            return_picking = self._create_return(line_return)
 
-                _logger.debug('DEBUG PICKINGS TO RETURN %s',
-                              pickings_to_return)
-                _logger.debug('DEBUG product_qty_return_by_picking %s',
-                              product_qty_return_by_picking)
+            if line_return.reason_return_cat_type == 'return_supplier':
+                self._create_return(line_return, return_supplier=True)
+
+            ReturnReasonProductQty = self.env['return.reason.product.qty']
+            line_return_stored = ReturnReasonProductQty.search([
+                ('wizard_hash', '=', line_return.wizard_hash),
+                ('record_hash', '=', line_return.record_hash),
+                ('product_id', '=', line_return.product_id.id),
+                ('picking_id', '=', line_return.picking_id.id),
+                ('completed', '=', False),
+            ])
+
+            if line_return_stored:
+                line_return_stored.write({'completed': True})
+            _logger.debug('DEBUG RETURN PICKING %s', return_picking)
 
 
 class ReturnProductReasonUnit(models.TransientModel):
@@ -336,9 +424,10 @@ class ReturnProductReasonUnit(models.TransientModel):
     sale_product_price = fields.Float(
         'Amount', digits=dp.get_precision('Product Price'), default=0.0)
     picking_purchase_name = fields.Char('Picking Name of Purchase')
+    picking_move_id = fields.Many2one('stock.move', 'Move of product')
 
-    @api.onchange('reason_return_id')
-    def onchange_reason_return_id(self):
+    @api.onchange('reason_return_id', 'picking_purchase_name')
+    def onchange_fields(self):
 
         ReturnReasonProductQty = self.env['return.reason.product.qty']
 
@@ -348,5 +437,11 @@ class ReturnProductReasonUnit(models.TransientModel):
         ])
 
         if return_reason_product_rec:
-            return_reason_product_rec.write({
-                'reason_return_id': self.reason_return_id.id})
+
+            if self.reason_return_id:
+                return_reason_product_rec.write({
+                    'reason_return_id': self.reason_return_id.id})
+
+            if self.picking_purchase_name:
+                return_reason_product_rec.write({
+                    'picking_purchase_name': self.picking_purchase_name})

@@ -57,8 +57,7 @@
             <group>
               <field
                   name="return_reason_qty_ids"
-                  nolabel="1"
-                  domain="[('reason_return_id.expired', '=', False)]">
+                  nolabel="1">
                 
                 <tree editable="inline" create="false" delete="false">
                   <field name="product_default_code" />
@@ -73,13 +72,16 @@
                   <field name="return_location_id" />
                   <field
                       name="picking_purchase_name"
-                      attrs="{'readonly': [('reason_return_cat_type', '!=', 'return_supplier')]}" />
+                      attrs="{'readonly': [('reason_return_cat_type', '!=', 'return_supplier')], 'required': [('reason_return_cat_type', '=', 'return_supplier')] }" />
 
                   <!-- Hidden fields -->
                   <field name="wizard_hash" invisible="1" />
                   <field name="record_hash" invisible="1" />
                   <field name="reason_return_cat_type" invisible="1" />
                   <field name="reason_return_expired" invisible="1" />
+                  <field name="picking_id" invisible="1" />
+                  <field name="picking_move_id" invisible="1" />
+                  <field name="product_id" invisible="1" />
                 </tree>
               </field>
             </group>
