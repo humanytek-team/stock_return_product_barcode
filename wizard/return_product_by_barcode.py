@@ -284,8 +284,10 @@ class ReturnProductBarcode(models.TransientModel):
                 ('name', '=', line_return.picking_purchase_name),
             ])
             if not picking:
-                raise UserError('The picking receipt %s indicated in product %s does not exist.',
-                                line_return.picking_purchase_name, line_return.product_id.name)
+                raise UserError(
+                    _('The picking receipt %s indicated in product %s does not exist.' %
+                      (line_return.picking_purchase_name,
+                       line_return.product_id.name)))
             pick_type_id = line_return.reason_return_id.supplier_return_picking_type_id.id
             location_dest_id = line_return.reason_return_id.supplier_return_location_id.id
 
@@ -363,6 +365,207 @@ class ReturnProductBarcode(models.TransientModel):
 
         return new_picking
 
+    @api.model
+    def _get_invoice_line_account(self, product_category, return_supplier=False):
+        """Returns account for invoice line"""
+
+        if return_supplier:
+            if product_category.property_account_expense_categ_id:
+                return product_category.property_account_expense_categ_id
+            else:
+                if product_category.parent_id:
+                    return self._get_invoice_line_account(
+                        product_category.parent_id,
+                        return_supplier=return_supplier)
+
+        else:
+            if product_category.property_account_income_categ_id:
+                return product_category.property_account_income_categ_id
+            else:
+                if product_category.parent_id:
+                    return self._get_invoice_line_account(
+                        product_category.parent_id,
+                        return_supplier=return_supplier)
+
+        return False
+
+    @api.model
+    def _create_refund_invoice(self, line_return, return_supplier=False):
+        """Create refund invoices for customers or suppliers depending
+        on return type"""
+
+        AccountInvoice = self.env['account.invoice']
+        AccountInvoiceLine = self.env['account.invoice.line']
+
+        if line_return.reason_return_cat_type != 'return_supplier' or \
+           not return_supplier:
+
+            picking = line_return.picking_id
+
+        elif return_supplier:
+            StockPicking = self.env['stock.picking']
+            picking = StockPicking.search([
+                ('name', '=', line_return.picking_purchase_name),
+            ])
+            if not picking:
+                raise UserError(
+                    _('The picking receipt %s indicated in product %s does not exist.' % (
+                        line_return.picking_purchase_name,
+                        line_return.product_id.name)))
+
+        if picking.picking_type_code == 'incoming' and \
+           picking.purchase_id:
+
+            invoices = picking.purchase_id.invoice_ids.filtered(
+                lambda inv: inv.state != 'cancel'
+            )
+
+            if line_return.product_id.supplier_taxes_id:
+                invoice_line_taxes_id = [
+                    (4, tax.id)
+                    for tax in
+                    line_return.product_id.supplier_taxes_id
+                ]
+            else:
+                invoice_line_taxes_id = False
+
+            invoice_line_account_id = False
+            if line_return.product_id.property_account_expense_id:
+
+                invoice_line_account_id = line_return.product_id.property_account_expense_id.id
+
+            elif line_return.product_id.categ_id:
+                invoice_line_account = self._get_invoice_line_account(
+                    line_return.product_id.categ_id,
+                    return_supplier=return_supplier)
+                invoice_line_account_id = invoice_line_account and \
+                    invoice_line_account.id
+
+            if not invoice_line_account_id:
+                raise UserError(
+                    _('You must set up an expense account for the product %s' %
+                      line_return.product_id.name))
+
+            invoice_line_name = line_return.product_id.description_purchase
+
+        elif picking.picking_type_code == 'outgoing' and \
+                picking.sale_id:
+
+            invoices = picking.sale_id.invoice_ids.filtered(
+                lambda inv: inv.state != 'cancel'
+            )
+
+            if line_return.product_id.taxes_id:
+                invoice_line_taxes_id = [
+                    (4, tax.id)
+                    for tax in
+                    line_return.product_id.taxes_id
+                ]
+            else:
+                invoice_line_taxes_id = False
+
+            invoice_line_account_id = False
+            if line_return.product_id.property_account_income_id:
+
+                invoice_line_account_id = line_return.product_id.property_account_income_id.id
+
+            elif line_return.product_id.categ_id:
+                invoice_line_account = self._get_invoice_line_account(
+                    line_return.product_id.categ_id,
+                    return_supplier=return_supplier)
+                invoice_line_account_id = invoice_line_account and \
+                    invoice_line_account.id
+
+            if not invoice_line_account_id:
+                raise UserError(
+                    _('You must set up an income account for the product %s' %
+                      line_return.product_id.name))
+
+            invoice_line_name = line_return.product_id.description_sale
+
+        invoice_origin = False
+
+        if invoices:
+            invoice_origin = invoices[0]
+            if picking.picking_type_code == 'incoming':
+                refund_invoice_type = 'in_refund'
+            else:
+                refund_invoice_type = 'out_refund'
+
+            refund_invoice_data = {
+                'type': refund_invoice_type,
+                'origin': invoice_origin.number,
+                'partner_id': invoices[0].partner_id.id,
+                'currency_id': invoices[0].currency_id.id,
+                'company_id': invoices[0].company_id.id,
+            }
+
+            invoice_origin_product_line = invoice_origin.invoice_line_ids.filtered(
+                lambda line: line.product_id.id == line_return.product_id.id
+            )
+
+            product_price_unit = invoice_origin_product_line[0].price_unit
+
+        elif picking.picking_type_code == 'incoming' and \
+                picking.purchase_id:
+
+            refund_invoice_data = {
+                'type': 'in_refund',
+                'partner_id': picking.partner_id.id,
+                'currency_id': picking.purchase_id.currency_id.id,
+                'company_id': picking.purchase_id.company_id.id,
+            }
+
+            purchase_product_line = picking.purchase_id.order_line.filtered(
+                lambda line: line.product_id.id == line_return.product_id.id
+            )
+
+            product_price_unit = purchase_product_line[0].price_unit
+
+        elif picking.picking_type_code == 'outgoing' and \
+                picking.sale_id:
+
+            refund_invoice_data = {
+                'type': 'out_refund',
+                'partner_id': picking.partner_id.id,
+                'currency_id': picking.sale_id.currency_id.id,
+                'company_id': picking.sale_id.company_id.id,
+            }
+
+            sale_product_line = picking.sale_id.order_line.filtered(
+                lambda line: line.product_id.id == line_return.product_id.id
+            )
+
+            product_price_unit = sale_product_line[0].price_unit
+
+        refund_invoice = AccountInvoice.create(refund_invoice_data)
+
+        # The next lines of try applies only for MX
+        try:
+            refund_invoice.write({
+                'validate_attachment': True,
+                'validate_attachment2': True,
+            })
+        except Exception:
+            _logger.debug('MX l10n modules are not installed')
+            pass
+
+        if not invoice_line_name:
+            invoice_line_name = line_return.product_id.name
+
+        AccountInvoiceLine.create({
+            'name': invoice_line_name,
+            'invoice_id': refund_invoice.id,
+            'product_id': line_return.product_id.id,
+            'quantity': line_return.product_uom_qty,
+            'price_unit': product_price_unit,
+            'partner_id': refund_invoice.partner_id.id,
+            'account_id': invoice_line_account_id,
+            'invoice_line_tax_ids': invoice_line_taxes_id,
+        })
+
+        refund_invoice.compute_taxes()
+
     @api.multi
     def return_product(self):
         """Proccess returns of product"""
@@ -371,7 +574,7 @@ class ReturnProductBarcode(models.TransientModel):
 
         for line_return in self.return_reason_qty_ids:
 
-            return_picking = self._create_return(line_return)
+            self._create_return(line_return)
 
             if line_return.reason_return_cat_type == 'return_supplier':
                 self._create_return(line_return, return_supplier=True)
@@ -387,6 +590,10 @@ class ReturnProductBarcode(models.TransientModel):
 
             if line_return_stored:
                 line_return_stored.write({'completed': True})
+
+            self._create_refund_invoice(line_return)
+            if line_return.reason_return_cat_type == 'return_supplier':
+                self._create_refund_invoice(line_return, return_supplier=True)
 
 
 class ReturnProductReasonUnit(models.TransientModel):

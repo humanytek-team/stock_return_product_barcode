@@ -12,6 +12,7 @@
     'depends': [
         'stock',
         'sale_stock',
+        'purchase',
         'stock_warehouse_returns',
         'sale_stock_restrict_return_picking_expiration_time',
     ],
