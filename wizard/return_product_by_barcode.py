@@ -57,6 +57,10 @@ class ReturnProductBarcode(models.TransientModel):
         'Quantity by reason',
         required=True)
     wizard_hash = fields.Char('Wizard hash', default=_compute_wizard_hash)
+    total_category_ids = fields.One2many(
+        'return.product.total.category',
+        'wizard_id',
+        'Total returns by Category')
 
     @api.model
     def _get_picking(self, customer, product, expired=False):
@@ -572,6 +576,8 @@ class ReturnProductBarcode(models.TransientModel):
 
         self.ensure_one()
 
+        total_returns_category = dict()
+
         for line_return in self.return_reason_qty_ids:
 
             self._create_return(line_return)
@@ -594,6 +600,39 @@ class ReturnProductBarcode(models.TransientModel):
             self._create_refund_invoice(line_return)
             if line_return.reason_return_cat_type == 'return_supplier':
                 self._create_refund_invoice(line_return, return_supplier=True)
+
+            if str(line_return.reason_return_id.category_id.id) \
+               not in total_returns_category:
+
+                total_returns_category.update({
+                    str(line_return.reason_return_id.category_id.id):
+                    line_return.product_uom_qty
+                })
+
+            else:
+                total_returns_category[
+                    str(line_return.reason_return_id.category_id.id)] += \
+                    line_return.product_uom_qty
+
+        if total_returns_category:
+            total_category_ids = list()
+
+            for categ_id in total_returns_category:
+                total_category_ids.append((0, 0, {
+                    'reason_return_categ_id': int(categ_id),
+                    'total': total_returns_category[categ_id],
+                }))
+
+            self.total_category_ids = total_category_ids
+            return {
+                'name': _('Total Returns by Category'),
+                'context': self._context,
+                'view_type': 'form',
+                'view_mode': 'tree',
+                'res_model': 'return.product.total.category',
+                'type': 'ir.actions.act_window',
+                'domain': [('wizard_id', '=', self.id)],
+            }
 
 
 class ReturnProductReasonUnit(models.TransientModel):
@@ -644,3 +683,13 @@ class ReturnProductReasonUnit(models.TransientModel):
             if self.picking_purchase_name:
                 return_reason_product_rec.write({
                     'picking_purchase_name': self.picking_purchase_name})
+
+
+class ReturnProductTotalCategory(models.TransientModel):
+    _name = 'return.product.total.category'
+
+    total = fields.Float('Total', required=True)
+    reason_return_categ_id = fields.Many2one(
+        'stock.warehouse.return.category', 'Category', required=True)
+    wizard_id = fields.Many2one(
+        'return.product.barcode', 'Wizard', required=True)

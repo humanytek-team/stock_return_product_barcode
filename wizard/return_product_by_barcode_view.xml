@@ -123,5 +123,24 @@
         action="action_return_product_barcode"
         parent="stock.menu_stock_inventory_control"/>
 
+    <record id="view_return_product_total_categ_tree" model="ir.ui.view">
+      <field name="name">return.product.total.categ.tree</field>
+      <field name="model">return.product.total.category</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="reason_return_categ_id" />
+          <field name="total" />
+          <field name="wizard_id" invisible="1" />
+        </tree>
+      </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="action_return_product_total_categ_wizard">
+      <field name="name">Total Returns by Category</field>
+      <field name="res_model">return.product.total.category</field>
+      <field name="view_type">form</field>
+      <field name="view_mode">tree</field>
+    </record>
+
   </data>
 </openerp>
