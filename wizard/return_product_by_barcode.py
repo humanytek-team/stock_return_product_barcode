@@ -23,7 +23,7 @@ class ReturnProductBarcode(models.TransientModel):
 
         valid_datetime = datetime.now() - timedelta(days=expiration_days_qty)
         valid_date = valid_datetime.strftime('%Y-%m-%d')
-        _logger.debug('DEBUG VALID DATE RETURNS %s', valid_date)
+
         return valid_date
 
     def _compute_wizard_hash(self):
@@ -61,12 +61,12 @@ class ReturnProductBarcode(models.TransientModel):
     @api.model
     def _get_picking(self, customer, product):
         """Returns stock picking"""
-        _logger.debug('DEBUG GET PICKING PRODUCT %s', product)
+
         customer.ensure_one()
         product.ensure_one()
 
         StockPicking = self.env['stock.picking']
-        _logger.debug('DEBUG ERROR DATETIME BEFORE')
+
         pickings = StockPicking.search([
             ('company_id', '=', self.env.user.company_id.id),
             ('partner_id', '=', customer.id),
@@ -76,7 +76,7 @@ class ReturnProductBarcode(models.TransientModel):
             ('sale_id.state', 'in', ['sale', 'done']),
             ('state', '=', 'done'),
         ], order='min_date')
-        _logger.debug('DEBUG ERROR DATETIME AFTER %s', pickings)
+
         if pickings:
 
             for picking in pickings:
@@ -87,17 +87,14 @@ class ReturnProductBarcode(models.TransientModel):
                     ('state', '=', 'done'),
                     ('picking_type_code', '=', 'incoming'),
                 ])
-                _logger.debug(
-                    'DEBUG ERROR PICKINGGGG pickings_childs_returned %s', pickings_childs_returned)
+
                 pck_moves_product = picking.move_lines_related.filtered(
                     lambda move: move.product_id.id == product.id
                     and move.state == 'done')
-                _logger.debug(
-                    'DEBUG ERROR PICKINGGGG pck_moves_product %s', pck_moves_product)
+
                 pck_product_qty_total = sum(
                     pck_moves_product.mapped('product_uom_qty'))
-                _logger.debug(
-                    'DEBUG ERROR PICKINGGGG pck_product_qty_total %s', pck_product_qty_total)
+
                 ReturnReasonProductQty = self.env['return.reason.product.qty']
                 # TODO: no more than one instance of the wizard is being considered simultaneously.
                 # Fix this.
@@ -107,40 +104,29 @@ class ReturnProductBarcode(models.TransientModel):
                     ('picking_id', '=', picking.id),
                     ('completed', '=', False),
                 ])
-                _logger.debug(
-                    'DEBUG ERROR PICKINGGGG picking_taken %s', picking_taken)
+
                 if not pickings_childs_returned:
 
                     if len(picking_taken) < pck_product_qty_total:
-                        _logger.debug(
-                            'DEBUG ERROR PICKINGGGG WITHOUT RETURNS %s', picking)
                         return picking
 
                 else:
 
-                    _logger.debug(
-                        'DEBUG ERROR PICKINGGGG WITH RETURNS %s', picking)
-                    _logger.debug(
-                        'DEBUG ERROR PICKINGGGG TEST FILTERED %s', pickings_childs_returned[0].move_lines_related)
                     pck_returned_moves_with_product = \
                         pickings_childs_returned.mapped('move_lines_related').filtered(
                             lambda move: move.product_id.id == product.id and
                             move.state == 'done'
                         )
-                    _logger.debug(
-                        'DEBUG ERROR PICKINGGGG WITH RETURNS pck_returned_moves_with_product %s', pck_returned_moves_with_product)
+
                     pickings_returned_product_qty_total = sum(
                         pck_returned_moves_with_product.mapped(
                             'product_uom_qty')
                     )
-                    _logger.debug(
-                        'DEBUG ERROR PICKINGGGG WITH RETURNS pickings_returned_product_qty_total %s', pickings_returned_product_qty_total)
+
                     if (pickings_returned_product_qty_total +
                         len(picking_taken)) < \
                        pck_product_qty_total:
 
-                        _logger.debug(
-                            'DEBUG ERROR PICKINGGGG WITH RETURNS %s', picking)
                         return picking
         return False
 
@@ -214,17 +200,15 @@ class ReturnProductBarcode(models.TransientModel):
 
                 picking = self._get_picking(self.customer_id, product)
                 reason_return_id = False
-                _logger.debug('DEBUG PICKING %s', picking)
+
                 if picking:
 
                     sale_product_price = self._get_sale_product_price(
                         picking.sale_id, product)
-                    _logger.debug('DEBUG IF PICKING %s', sale_product_price)
                     picking_move = self._get_move_product(
                         picking, product)
-                    _logger.debug('DEBUG IF PICKING %s', picking_move)
                     picking_move_id = picking_move and picking_move.id
-                    _logger.debug('DEBUG MOVE %s', picking_move_id)
+
                 else:
                     sale_product_price = False
                     picking_move_id = False
@@ -235,7 +219,7 @@ class ReturnProductBarcode(models.TransientModel):
 
                     if expired_reason_return:
                         reason_return_id = expired_reason_return[0].id
-                _logger.debug('DEBUG PICKING IN ONCHANGE %s', picking)
+
                 return_reason_unit_data = {
                     'product_id': self.product_id.id,
                     'product_uom_qty': 1,
@@ -260,18 +244,19 @@ class ReturnProductBarcode(models.TransientModel):
     @api.model
     def _do_transfer_return(self, picking):
         self.ensure_one()
+
         for pack in picking.pack_operation_ids:
             if pack.product_qty > 0:
                 pack.write({'qty_done': pack.product_qty})
             else:
                 pack.unlink()
+
         picking.do_transfer()
 
     @api.model
     def _create_return(self, line_return, return_supplier=False):
         """Returns picking of return of product."""
 
-        _logger.debug('DEBUG PICKING %s', line_return.picking_id)
         if line_return.reason_return_cat_type != 'return_supplier' or \
            not return_supplier:
             picking = line_return.picking_id
@@ -344,7 +329,7 @@ class ReturnProductBarcode(models.TransientModel):
         else:
             move_dest_id = False
 
-        new_picking_move = move.copy({
+        move.copy({
             'product_id': line_return.product_id.id,
             'product_uom_qty': line_return.product_uom_qty,
             'picking_id': new_picking.id,
@@ -357,26 +342,20 @@ class ReturnProductBarcode(models.TransientModel):
             'procure_method': 'make_to_stock',
             'move_dest_id': move_dest_id,
         })
-        _logger.debug('DEBUG RETURN PICKING %s', new_picking)
-        _logger.debug('DEBUG RETURN PICKING MOVE LINES %s',
-                      new_picking.move_lines)
-        _logger.debug('DEBUG MOVE COPY %s',
-                      new_picking_move)
+
         new_picking.action_confirm()
         new_picking.action_assign()
         self._do_transfer_return(new_picking)
+
         return new_picking
 
     @api.multi
     def return_product(self):
         """Proccess returns of product"""
-        _logger.debug('DEBUG RETURN PRODUCT %s', self.return_reason_qty_ids)
+
         self.ensure_one()
 
         for line_return in self.return_reason_qty_ids:
-
-            _logger.debug('DEBUG LINE RETURN %s', line_return)
-            _logger.debug('DEBUG LINE RETURN %s', line_return.picking_id)
 
             return_picking = self._create_return(line_return)
 
@@ -394,7 +373,6 @@ class ReturnProductBarcode(models.TransientModel):
 
             if line_return_stored:
                 line_return_stored.write({'completed': True})
-            _logger.debug('DEBUG RETURN PICKING %s', return_picking)
 
 
 class ReturnProductReasonUnit(models.TransientModel):
