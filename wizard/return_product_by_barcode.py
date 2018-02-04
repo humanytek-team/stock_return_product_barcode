@@ -59,7 +59,7 @@ class ReturnProductBarcode(models.TransientModel):
     wizard_hash = fields.Char('Wizard hash', default=_compute_wizard_hash)
 
     @api.model
-    def _get_picking(self, customer, product):
+    def _get_picking(self, customer, product, expired=False):
         """Returns stock picking"""
 
         customer.ensure_one()
@@ -67,15 +67,30 @@ class ReturnProductBarcode(models.TransientModel):
 
         StockPicking = self.env['stock.picking']
 
-        pickings = StockPicking.search([
-            ('company_id', '=', self.env.user.company_id.id),
-            ('partner_id', '=', customer.id),
-            ('sale_id.date_order', '>=', self._get_valid_date()),
-            ('move_lines_related.product_id', '=', product.id),
-            ('picking_type_code', '=', 'outgoing'),
-            ('sale_id.state', 'in', ['sale', 'done']),
-            ('state', '=', 'done'),
-        ], order='min_date')
+        if expired:
+            domain_search = [
+                ('company_id', '=', self.env.user.company_id.id),
+                ('partner_id', '=', customer.id),
+                ('move_lines_related.product_id', '=', product.id),
+                ('picking_type_code', '=', 'outgoing'),
+                ('sale_id.state', 'in', ['sale', 'done']),
+                ('state', '=', 'done'),
+            ]
+            order_search = 'min_date desc'
+
+        else:
+            domain_search = [
+                ('company_id', '=', self.env.user.company_id.id),
+                ('partner_id', '=', customer.id),
+                ('sale_id.date_order', '>=', self._get_valid_date()),
+                ('move_lines_related.product_id', '=', product.id),
+                ('picking_type_code', '=', 'outgoing'),
+                ('sale_id.state', 'in', ['sale', 'done']),
+                ('state', '=', 'done'),
+            ]
+            order_search = 'min_date'
+
+        pickings = StockPicking.search(domain_search, order=order_search)
 
         if pickings:
 
@@ -201,17 +216,10 @@ class ReturnProductBarcode(models.TransientModel):
                 picking = self._get_picking(self.customer_id, product)
                 reason_return_id = False
 
-                if picking:
+                if not picking:
 
-                    sale_product_price = self._get_sale_product_price(
-                        picking.sale_id, product)
-                    picking_move = self._get_move_product(
-                        picking, product)
-                    picking_move_id = picking_move and picking_move.id
-
-                else:
-                    sale_product_price = False
-                    picking_move_id = False
+                    picking = self._get_picking(
+                        self.customer_id, product, expired=True)
                     StockWarehouseReturn = self.env['stock.warehouse.return']
                     expired_reason_return = StockWarehouseReturn.search([
                         ('expired', '=', True),
@@ -219,6 +227,12 @@ class ReturnProductBarcode(models.TransientModel):
 
                     if expired_reason_return:
                         reason_return_id = expired_reason_return[0].id
+
+                sale_product_price = self._get_sale_product_price(
+                    picking.sale_id, product)
+                picking_move = self._get_move_product(
+                    picking, product)
+                picking_move_id = picking_move and picking_move.id
 
                 return_reason_unit_data = {
                     'product_id': self.product_id.id,
