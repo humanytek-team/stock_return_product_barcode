@@ -77,6 +77,7 @@ class ReturnProductBarcode(models.TransientModel):
                 ('partner_id', '=', customer.id),
                 ('move_lines_related.product_id', '=', product.id),
                 ('picking_type_code', '=', 'outgoing'),
+                ('sale_id', '!=', False),
                 ('sale_id.state', 'in', ['sale', 'done']),
                 ('state', '=', 'done'),
             ]
@@ -89,6 +90,7 @@ class ReturnProductBarcode(models.TransientModel):
                 ('sale_id.date_order', '>=', self._get_valid_date()),
                 ('move_lines_related.product_id', '=', product.id),
                 ('picking_type_code', '=', 'outgoing'),
+                ('sale_id', '!=', False),
                 ('sale_id.state', 'in', ['sale', 'done']),
                 ('state', '=', 'done'),
             ]
