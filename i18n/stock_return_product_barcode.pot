@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 9.0e\n"
+"Project-Id-Version: Odoo Server 9.0e-20170815\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-02-08 12:05+0000\n"
-"PO-Revision-Date: 2018-02-08 12:05+0000\n"
+"POT-Creation-Date: 2018-02-08 12:31+0000\n"
+"PO-Revision-Date: 2018-02-08 12:31+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -121,7 +121,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_reason_unit_id
 #: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_total_category_id
 #: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_reason_product_qty_id
-#: model:ir.model.fields,field_description:stock_return_product_barcode.field_stock_warehouse_return_category_id_9387
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_stock_warehouse_return_category_id_7283
 msgid "ID"
 msgstr ""
 
@@ -188,6 +188,12 @@ msgstr ""
 #. module: stock_return_product_barcode
 #: selection:stock.warehouse.return.category,type:0
 msgid "No Accepted"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: code:addons/stock_return_product_barcode/wizard/return_product_by_barcode.py:237
+#, python-format
+msgid "No sales confirmed of this product were found for this customer"
 msgstr ""
 
 #. module: stock_return_product_barcode
@@ -290,8 +296,8 @@ msgid "Technical field"
 msgstr ""
 
 #. module: stock_return_product_barcode
-#: code:addons/stock_return_product_barcode/wizard/return_product_by_barcode.py:295
-#: code:addons/stock_return_product_barcode/wizard/return_product_by_barcode.py:418
+#: code:addons/stock_return_product_barcode/wizard/return_product_by_barcode.py:305
+#: code:addons/stock_return_product_barcode/wizard/return_product_by_barcode.py:428
 #, python-format
 msgid "The picking receipt %s indicated in product %s does not exist."
 msgstr ""
@@ -307,7 +313,7 @@ msgid "The weight of the contents in Kg, not including any packaging, etc."
 msgstr ""
 
 #. module: stock_return_product_barcode
-#: code:addons/stock_return_product_barcode/wizard/return_product_by_barcode.py:262
+#: code:addons/stock_return_product_barcode/wizard/return_product_by_barcode.py:272
 #, python-format
 msgid "There is no product with that barcode."
 msgstr ""
@@ -329,7 +335,7 @@ msgid "Total"
 msgstr ""
 
 #. module: stock_return_product_barcode
-#: code:addons/stock_return_product_barcode/wizard/return_product_by_barcode.py:630
+#: code:addons/stock_return_product_barcode/wizard/return_product_by_barcode.py:640
 #: model:ir.actions.act_window,name:stock_return_product_barcode.action_return_product_total_categ_wizard
 #, python-format
 msgid "Total Returns by Category"
@@ -349,7 +355,7 @@ msgstr ""
 #. module: stock_return_product_barcode
 #: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_reason_unit_reason_return_cat_type
 #: model:ir.model.fields,field_description:stock_return_product_barcode.field_stock_warehouse_return_category_type
-#: model:ir.model.fields,field_description:stock_return_product_barcode.field_stock_warehouse_return_category_type_9386
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_stock_warehouse_return_category_type_7317
 msgid "Type of Category"
 msgstr ""
 
@@ -393,19 +399,25 @@ msgid "Wizard hash"
 msgstr ""
 
 #. module: stock_return_product_barcode
-#: code:addons/stock_return_product_barcode/wizard/return_product_by_barcode.py:306
+#: code:addons/stock_return_product_barcode/wizard/return_product_by_barcode.py:316
 #, python-format
 msgid "You may only return pickings that are Done!"
 msgstr ""
 
 #. module: stock_return_product_barcode
-#: code:addons/stock_return_product_barcode/wizard/return_product_by_barcode.py:452
+#: code:addons/stock_return_product_barcode/wizard/return_product_by_barcode.py:186
+#, python-format
+msgid "You must indicate the customer"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: code:addons/stock_return_product_barcode/wizard/return_product_by_barcode.py:462
 #, python-format
 msgid "You must set up an expense account for the product %s"
 msgstr ""
 
 #. module: stock_return_product_barcode
-#: code:addons/stock_return_product_barcode/wizard/return_product_by_barcode.py:487
+#: code:addons/stock_return_product_barcode/wizard/return_product_by_barcode.py:497
 #, python-format
 msgid "You must set up an income account for the product %s"
 msgstr ""

@@ -4,17 +4,17 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 9.0e\n"
+"Project-Id-Version: Odoo Server 9.0e-20170815\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-02-08 12:06+0000\n"
-"PO-Revision-Date: 2018-02-08 08:20-0400\n"
+"POT-Creation-Date: 2018-02-08 12:31+0000\n"
+"PO-Revision-Date: 2018-02-08 08:35-0400\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: \n"
-"Language: es_MX\n"
+"Language: es\n"
 "X-Generator: Poedit 1.8.11\n"
 
 #. module: stock_return_product_barcode
@@ -111,7 +111,7 @@ msgstr "Cliente"
 #: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_reason_product_qty_display_name
 #: model:ir.model.fields,field_description:stock_return_product_barcode.field_stock_warehouse_return_category_display_name
 msgid "Display Name"
-msgstr "Nombre mostrado"
+msgstr "Nombre desplegado"
 
 #. module: stock_return_product_barcode
 #: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_barcode_product_weight
@@ -123,7 +123,7 @@ msgstr "Peso bruto"
 #: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_reason_unit_id
 #: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_total_category_id
 #: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_reason_product_qty_id
-#: model:ir.model.fields,field_description:stock_return_product_barcode.field_stock_warehouse_return_category_id_9387
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_stock_warehouse_return_category_id_7283
 msgid "ID"
 msgstr "ID"
 
@@ -151,7 +151,7 @@ msgstr "Número Internacional del artículo utilizado para la identificación de
 #: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_reason_product_qty___last_update
 #: model:ir.model.fields,field_description:stock_return_product_barcode.field_stock_warehouse_return_category___last_update
 msgid "Last Modified on"
-msgstr "Última modificación en"
+msgstr "Ultima modificacion realizada"
 
 #. module: stock_return_product_barcode
 #: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_barcode_write_uid
@@ -160,7 +160,7 @@ msgstr "Última modificación en"
 #: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_reason_product_qty_write_uid
 #: model:ir.model.fields,field_description:stock_return_product_barcode.field_stock_warehouse_return_category_write_uid
 msgid "Last Updated by"
-msgstr "Última actualización de"
+msgstr "Ultima actualizacion por"
 
 #. module: stock_return_product_barcode
 #: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_barcode_write_date
@@ -169,7 +169,7 @@ msgstr "Última actualización de"
 #: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_reason_product_qty_write_date
 #: model:ir.model.fields,field_description:stock_return_product_barcode.field_stock_warehouse_return_category_write_date
 msgid "Last Updated on"
-msgstr "Última actualización en"
+msgstr "Ultima actualización realizada"
 
 #. module: stock_return_product_barcode
 #: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_barcode_product_image_medium
@@ -191,6 +191,12 @@ msgstr "Nombre"
 #: selection:stock.warehouse.return.category,type:0
 msgid "No Accepted"
 msgstr "No Aceptado"
+
+#. module: stock_return_product_barcode
+#: code:addons/stock_return_product_barcode/wizard/return_product_by_barcode.py:237
+#, python-format
+msgid "No sales confirmed of this product were found for this customer"
+msgstr "No se encontró pedidos de venta confirmados de este producto para este cliente."
 
 #. module: stock_return_product_barcode
 #: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_reason_unit_sale_date_order
@@ -292,8 +298,8 @@ msgid "Technical field"
 msgstr "Technical field"
 
 #. module: stock_return_product_barcode
-#: code:addons/stock_return_product_barcode/wizard/return_product_by_barcode.py:295
-#: code:addons/stock_return_product_barcode/wizard/return_product_by_barcode.py:418
+#: code:addons/stock_return_product_barcode/wizard/return_product_by_barcode.py:305
+#: code:addons/stock_return_product_barcode/wizard/return_product_by_barcode.py:428
 #, python-format
 msgid "The picking receipt %s indicated in product %s does not exist."
 msgstr "El albarán de entrada %s indicado en el producto %s no existe."
@@ -309,7 +315,7 @@ msgid "The weight of the contents in Kg, not including any packaging, etc."
 msgstr "El peso del contenido en Kg, sin incluir empaquetado, etc..."
 
 #. module: stock_return_product_barcode
-#: code:addons/stock_return_product_barcode/wizard/return_product_by_barcode.py:262
+#: code:addons/stock_return_product_barcode/wizard/return_product_by_barcode.py:272
 #, python-format
 msgid "There is no product with that barcode."
 msgstr "No existe ningún producto con este código de barras."
@@ -331,7 +337,7 @@ msgid "Total"
 msgstr "Total"
 
 #. module: stock_return_product_barcode
-#: code:addons/stock_return_product_barcode/wizard/return_product_by_barcode.py:630
+#: code:addons/stock_return_product_barcode/wizard/return_product_by_barcode.py:640
 #: model:ir.actions.act_window,name:stock_return_product_barcode.action_return_product_total_categ_wizard
 #, python-format
 msgid "Total Returns by Category"
@@ -351,7 +357,7 @@ msgstr "Transferir"
 #. module: stock_return_product_barcode
 #: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_reason_unit_reason_return_cat_type
 #: model:ir.model.fields,field_description:stock_return_product_barcode.field_stock_warehouse_return_category_type
-#: model:ir.model.fields,field_description:stock_return_product_barcode.field_stock_warehouse_return_category_type_9386
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_stock_warehouse_return_category_type_7317
 msgid "Type of Category"
 msgstr "Tipo de Categoría"
 
@@ -395,19 +401,25 @@ msgid "Wizard hash"
 msgstr "Wizard hash"
 
 #. module: stock_return_product_barcode
-#: code:addons/stock_return_product_barcode/wizard/return_product_by_barcode.py:306
+#: code:addons/stock_return_product_barcode/wizard/return_product_by_barcode.py:316
 #, python-format
 msgid "You may only return pickings that are Done!"
 msgstr "Puede devolver solo albaranes en estado Hecho"
 
 #. module: stock_return_product_barcode
-#: code:addons/stock_return_product_barcode/wizard/return_product_by_barcode.py:452
+#: code:addons/stock_return_product_barcode/wizard/return_product_by_barcode.py:186
+#, python-format
+msgid "You must indicate the customer"
+msgstr "Debe indicar el cliente"
+
+#. module: stock_return_product_barcode
+#: code:addons/stock_return_product_barcode/wizard/return_product_by_barcode.py:462
 #, python-format
 msgid "You must set up an expense account for the product %s"
 msgstr "Debe configurar una cuenta de gastos o costo de venta para el producto %s"
 
 #. module: stock_return_product_barcode
-#: code:addons/stock_return_product_barcode/wizard/return_product_by_barcode.py:487
+#: code:addons/stock_return_product_barcode/wizard/return_product_by_barcode.py:497
 #, python-format
 msgid "You must set up an income account for the product %s"
 msgstr "Debe configurar una cuenta de ingresos para el producto %s"
