@@ -1,0 +1,437 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* stock_return_product_barcode
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 9.0e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-02-08 12:05+0000\n"
+"PO-Revision-Date: 2018-02-08 12:05+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: stock_return_product_barcode
+#: model:ir.ui.view,arch_db:stock_return_product_barcode.return_product_barcode_form
+msgid "<span>kg</span>"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: selection:stock.warehouse.return.category,type:0
+msgid "Accepted"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.ui.view,arch_db:stock_return_product_barcode.stock_warehouse_return_category_form
+msgid "Active"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_stock_warehouse_return_category_active
+msgid "Active ?"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_reason_unit_sale_product_price
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_reason_product_qty_sale_product_price
+msgid "Amount"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_barcode_product_attribute_value_ids
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_reason_unit_product_attribute_value_ids
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_reason_product_qty_product_attribute_value_ids
+#: model:ir.ui.view,arch_db:stock_return_product_barcode.return_product_barcode_form
+msgid "Attributes"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_barcode_product_barcode
+#: model:ir.ui.view,arch_db:stock_return_product_barcode.return_product_barcode_form
+msgid "Barcode"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.ui.view,arch_db:stock_return_product_barcode.return_product_barcode_form
+msgid "Cancel"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_total_category_reason_return_categ_id
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_stock_warehouse_return_category_id
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_stock_warehouse_return_category_name
+#: model:ir.ui.view,arch_db:stock_return_product_barcode.stock_warehouse_return_category_form
+msgid "Category"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.actions.act_window,help:stock_return_product_barcode.action_stock_warehouse_return_category
+msgid "Click to define a new category of  warehouse return."
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_reason_product_qty_completed
+msgid "Completed ?"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_barcode_create_uid
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_reason_unit_create_uid
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_total_category_create_uid
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_reason_product_qty_create_uid
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_stock_warehouse_return_category_create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_barcode_create_date
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_reason_unit_create_date
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_total_category_create_date
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_reason_product_qty_create_date
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_stock_warehouse_return_category_create_date
+msgid "Created on"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_barcode_customer_id
+#: model:ir.ui.view,arch_db:stock_return_product_barcode.return_product_barcode_form
+msgid "Customer"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_barcode_display_name
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_reason_unit_display_name
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_total_category_display_name
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_reason_product_qty_display_name
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_stock_warehouse_return_category_display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_barcode_product_weight
+msgid "Gross Weight"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_barcode_id
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_reason_unit_id
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_total_category_id
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_reason_product_qty_id
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_stock_warehouse_return_category_id_9387
+msgid "ID"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.model.fields,help:stock_return_product_barcode.field_return_product_barcode_product_image_medium
+msgid "Image of the product variant (Medium-sized image of product template if false)."
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_barcode_product_default_code
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_reason_unit_product_default_code
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_reason_product_qty_product_default_code
+msgid "Internal Reference"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.model.fields,help:stock_return_product_barcode.field_return_product_barcode_product_barcode
+msgid "International Article Number used for product identification."
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_barcode___last_update
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_reason_unit___last_update
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_total_category___last_update
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_reason_product_qty___last_update
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_stock_warehouse_return_category___last_update
+msgid "Last Modified on"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_barcode_write_uid
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_reason_unit_write_uid
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_total_category_write_uid
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_reason_product_qty_write_uid
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_stock_warehouse_return_category_write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_barcode_write_date
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_reason_unit_write_date
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_total_category_write_date
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_reason_product_qty_write_date
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_stock_warehouse_return_category_write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_barcode_product_image_medium
+msgid "Medium-sized image"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_reason_unit_picking_move_id
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_reason_product_qty_picking_move_id
+msgid "Move of product"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_barcode_product_name
+msgid "Name"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: selection:stock.warehouse.return.category,type:0
+msgid "No Accepted"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_reason_unit_sale_date_order
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_reason_product_qty_sale_date_order
+msgid "Order Date"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_reason_unit_picking_purchase_name
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_reason_product_qty_picking_purchase_name
+msgid "Picking Name of Purchase"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_stock_warehouse_return_return_picking_type_id
+msgid "Picking Type for Returns"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_stock_warehouse_return_supplier_return_picking_type_id
+msgid "Picking Type for Returns of Suppliers"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.model,name:stock_return_product_barcode.model_stock_warehouse_return
+msgid "Posible warehouse returns"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_barcode_product_id
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_reason_unit_product_id
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_reason_product_qty_product_id
+#: model:ir.ui.view,arch_db:stock_return_product_barcode.return_product_barcode_form
+msgid "Product"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_reason_unit_product_uom_qty
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_reason_product_qty_product_uom_qty
+msgid "Quantity"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_barcode_return_reason_qty_ids
+#: model:ir.ui.view,arch_db:stock_return_product_barcode.return_product_barcode_form
+msgid "Quantity by reason"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_reason_unit_record_hash
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_reason_product_qty_record_hash
+msgid "Record hash"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_reason_unit_return_location_id
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_reason_product_qty_return_location_id
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_stock_warehouse_return_return_location_id
+msgid "Return Location"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_reason_unit_reason_return_id
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_reason_product_qty_reason_return_id
+msgid "Return Reason"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.ui.view,arch_db:stock_return_product_barcode.return_product_barcode_form
+msgid "Return product"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.actions.act_window,name:stock_return_product_barcode.action_return_product_barcode
+#: model:ir.ui.menu,name:stock_return_product_barcode.menu_return_product_barcode
+msgid "Return product by barcode"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.ui.view,arch_db:stock_return_product_barcode.stock_warehouse_return_form_inherit
+#: selection:stock.warehouse.return.category,type:0
+msgid "Return to Supplier"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_reason_unit_sale_id
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_reason_product_qty_sale_id
+msgid "Sale Order"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_stock_warehouse_return_supplier_return_location_id
+msgid "Supplier Return Location"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.model.fields,help:stock_return_product_barcode.field_return_reason_product_qty_completed
+msgid "Technical field"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: code:addons/stock_return_product_barcode/wizard/return_product_by_barcode.py:295
+#: code:addons/stock_return_product_barcode/wizard/return_product_by_barcode.py:418
+#, python-format
+msgid "The picking receipt %s indicated in product %s does not exist."
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.model.fields,help:stock_return_product_barcode.field_return_product_barcode_product_volume
+msgid "The volume in m3."
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.model.fields,help:stock_return_product_barcode.field_return_product_barcode_product_weight
+msgid "The weight of the contents in Kg, not including any packaging, etc."
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: code:addons/stock_return_product_barcode/wizard/return_product_by_barcode.py:262
+#, python-format
+msgid "There is no product with that barcode."
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.ui.view,arch_db:stock_return_product_barcode.return_product_barcode_form
+msgid "This wizard lets return several units of a product indicating its barcode"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_reason_unit_reason_return_expired
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_stock_warehouse_return_expired
+msgid "Time Expired"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_total_category_total
+msgid "Total"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: code:addons/stock_return_product_barcode/wizard/return_product_by_barcode.py:630
+#: model:ir.actions.act_window,name:stock_return_product_barcode.action_return_product_total_categ_wizard
+#, python-format
+msgid "Total Returns by Category"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_barcode_total_category_ids
+msgid "Total returns by Category"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_reason_unit_picking_id
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_reason_product_qty_picking_id
+msgid "Transfer"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_reason_unit_reason_return_cat_type
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_stock_warehouse_return_category_type
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_stock_warehouse_return_category_type_9386
+msgid "Type of Category"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_barcode_product_volume
+msgid "Volume"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.ui.view,arch_db:stock_return_product_barcode.stock_warehouse_return_category_form
+msgid "Warehouse Return Category"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.actions.act_window,name:stock_return_product_barcode.action_stock_warehouse_return_category
+#: model:ir.ui.menu,name:stock_return_product_barcode.menu_stock_warehouse_return_category
+msgid "Warehouse Returns Categories"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.ui.view,arch_db:stock_return_product_barcode.stock_warehouse_return_category_tree
+msgid "Warehouse Returns Category"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.ui.view,arch_db:stock_return_product_barcode.return_product_barcode_form
+msgid "Weights"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_reason_unit_wizard_id
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_total_category_wizard_id
+msgid "Wizard"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_barcode_wizard_hash
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_product_reason_unit_wizard_hash
+#: model:ir.model.fields,field_description:stock_return_product_barcode.field_return_reason_product_qty_wizard_hash
+msgid "Wizard hash"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: code:addons/stock_return_product_barcode/wizard/return_product_by_barcode.py:306
+#, python-format
+msgid "You may only return pickings that are Done!"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: code:addons/stock_return_product_barcode/wizard/return_product_by_barcode.py:452
+#, python-format
+msgid "You must set up an expense account for the product %s"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: code:addons/stock_return_product_barcode/wizard/return_product_by_barcode.py:487
+#, python-format
+msgid "You must set up an income account for the product %s"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.model,name:stock_return_product_barcode.model_return_product_barcode
+msgid "return.product.barcode"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.model,name:stock_return_product_barcode.model_return_product_reason_unit
+msgid "return.product.reason.unit"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.model,name:stock_return_product_barcode.model_return_product_total_category
+msgid "return.product.total.category"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.model,name:stock_return_product_barcode.model_return_reason_product_qty
+msgid "return.reason.product.qty"
+msgstr ""
+
+#. module: stock_return_product_barcode
+#: model:ir.model,name:stock_return_product_barcode.model_stock_warehouse_return_category
+msgid "stock.warehouse.return.category"
+msgstr ""
+

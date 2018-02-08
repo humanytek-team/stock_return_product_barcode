@@ -37,7 +37,7 @@ class ReturnProductBarcode(models.TransientModel):
         return wizard_hash
 
     customer_id = fields.Many2one('res.partner', 'Customer', domain=[
-                                  ('customer', '=', True)])
+                                  ('customer', '=', True)], required=True)
     product_id = fields.Many2one('product.product', 'Product', readonly=True)
     product_barcode = fields.Char(
         'Barcode',
@@ -181,6 +181,11 @@ class ReturnProductBarcode(models.TransientModel):
 
         if self.product_barcode:
 
+            if not self.customer_id:
+                raise UserError(
+                    _('You must indicate the customer')
+                )
+
             ProductProduct = self.env['product.product']
             product = ProductProduct.search(
                 [('barcode', '=', self.product_barcode)])
@@ -226,6 +231,11 @@ class ReturnProductBarcode(models.TransientModel):
 
                     picking = self._get_picking(
                         self.customer_id, product, expired=True)
+
+                    if not picking:
+                        raise UserError(
+                            _('No sales confirmed of this product were found for this customer'))
+
                     StockWarehouseReturn = self.env['stock.warehouse.return']
                     expired_reason_return = StockWarehouseReturn.search([
                         ('expired', '=', True),
