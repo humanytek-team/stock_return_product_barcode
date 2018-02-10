@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <record id="stock_warehouse_return_form_inherit" model="ir.ui.view">
+            <field name="name">stock.warehouse.return.form.inherit</field>
+            <field name="model">stock.warehouse.return</field>
+            <field name="inherit_id" ref="stock_warehouse_returns.stock_warehouse_return_form" />
+            <field name="arch" type="xml">
+
+              <xpath expr="//div" position="after">
+                <group>
+                  <group>
+                    <field name="return_location_id"/>
+                    <field name="expired"/>
+                  </group>
+                  <group>
+                    <field name="category_id"/>
+                    <field name="return_picking_type_id"/>
+                  </group>
+                </group>
+
+                <group>
+                  <group attrs="{'invisible': [('category_type', '!=', 'return_supplier')]}">
+                    <separator string="Return to Supplier" />
+                    <newline />
+                    <field
+                        name="supplier_return_location_id"
+                        attrs="{'required': [('category_type', '=', 'return_supplier')]}"/>
+                    <field
+                        name="supplier_return_picking_type_id"
+                        attrs="{'required': [('category_type', '=', 'return_supplier')]}"/>
+                  </group>
+                </group>
+
+                <!-- Hidden Fields -->
+                <field name="category_type" invisible="1" />
+              </xpath>
+
+            </field>
+        </record>
+
+        <record id="action_stock_warehouse_return_category" model="ir.actions.act_window">
+            <field name="name">Warehouse Returns Categories</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">stock.warehouse.return.category</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to define a new category of  warehouse return.
+              </p>
+            </field>
+        </record>
+
+        <record id="stock_warehouse_return_category_form" model="ir.ui.view">
+            <field name="name">stock.warehouse.return.category.form</field>
+            <field name="model">stock.warehouse.return.category</field>
+            <field name="arch" type="xml">
+                <form string="Warehouse Return Category">
+                    <sheet>
+                        <div class="oe_title">
+                            <label string="Category" />
+                            <h1>
+                                <field name="name"/>
+                            </h1>                            
+                            <label string="Active" />
+                            <field name="active" />
+                            <group>
+                              <group>
+                                <field name="type" />
+                              </group>
+                            </group>
+                        </div>
+
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="stock_warehouse_return_category_tree" model="ir.ui.view">
+            <field name="name">stock.warehouse.return.category.tree</field>
+            <field name="model">stock.warehouse.return.category</field>
+            <field name="arch" type="xml">
+                <tree string="Warehouse Returns Category">
+                    <field name="name" />
+                </tree>
+            </field>
+        </record>
+
+        <menuitem
+            id="menu_stock_warehouse_return_category"
+            name="Warehouse Returns Categories"
+            parent="stock.menu_warehouse_config"
+            action="action_stock_warehouse_return_category"
+            sequence="15"/>
+
+    </data>
+</openerp>
