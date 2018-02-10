@@ -5,5 +5,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [9.0.1.0.0] - 2018-02-10
 ### added
 - Adds wizard that allows manage returns of a product by barcode and reason.
