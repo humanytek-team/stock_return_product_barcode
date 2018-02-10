@@ -336,7 +336,7 @@ class ReturnProductBarcode(models.TransientModel):
                     to_check_moves += split_move_ids
 
         if moves_to_unreserve:
-            StockMove.do_unreserve(moves_to_unreserve)
+            StockMove.browse(moves_to_unreserve).do_unreserve()
             # break the link between moves in order to be able to fix them
             # later if needed
             StockMove.browse(moves_to_unreserve).write({
