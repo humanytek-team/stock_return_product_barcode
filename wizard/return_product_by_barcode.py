@@ -609,9 +609,11 @@ class ReturnProductBarcode(models.TransientModel):
             if line_return_stored:
                 line_return_stored.write({'completed': True})
 
-            self._create_refund_invoice(line_return)
-            if line_return.reason_return_cat_type == 'return_supplier':
-                self._create_refund_invoice(line_return, return_supplier=True)
+            if line_return.reason_return_cat_type != 'no_accepted':
+                self._create_refund_invoice(line_return)
+                if line_return.reason_return_cat_type == 'return_supplier':
+                    self._create_refund_invoice(
+                        line_return, return_supplier=True)
 
             if str(line_return.reason_return_id.category_id.id) \
                not in total_returns_category:
