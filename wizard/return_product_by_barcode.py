@@ -505,8 +505,12 @@ class ReturnProductBarcode(models.TransientModel):
             invoice_origin = invoices[0]
             if picking.picking_type_code == 'incoming':
                 refund_invoice_type = 'in_refund'
+                uom_id = line_return.product_id.uom_po_id and \
+                    line_return.product_id.uom_po_id.id
             else:
                 refund_invoice_type = 'out_refund'
+                uom_id = line_return.product_id.uom_id and \
+                    line_return.product_id.uom_id.id
 
             refund_invoice_data = {
                 'type': refund_invoice_type,
@@ -538,6 +542,9 @@ class ReturnProductBarcode(models.TransientModel):
 
             product_price_unit = purchase_product_line[0].price_unit
 
+            uom_id = line_return.product_id.uom_po_id and \
+                line_return.product_id.uom_po_id.id
+
         elif picking.picking_type_code == 'outgoing' and \
                 picking.sale_id:
 
@@ -553,6 +560,9 @@ class ReturnProductBarcode(models.TransientModel):
             )
 
             product_price_unit = sale_product_line[0].price_unit
+
+            uom_id = line_return.product_id.uom_id and \
+                line_return.product_id.uom_id.id
 
         refund_invoice = AccountInvoice.create(refund_invoice_data)
 
@@ -578,6 +588,7 @@ class ReturnProductBarcode(models.TransientModel):
             'partner_id': refund_invoice.partner_id.id,
             'account_id': invoice_line_account_id,
             'invoice_line_tax_ids': invoice_line_taxes_id,
+            'uom_id': uom_id,
         })
 
         refund_invoice.compute_taxes()
