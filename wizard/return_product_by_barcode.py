@@ -319,9 +319,9 @@ class ReturnProductBarcode(models.TransientModel):
 
         # Cancel assignment of existing chained assigned moves
         moves_to_unreserve = []
-        for move in picking.move_lines:
+        for move_line in picking.move_lines:
             to_check_moves = [
-                move.move_dest_id] if move.move_dest_id.id else []
+                move_line.move_dest_id] if move_line.move_dest_id else []
             while to_check_moves:
                 current_move = to_check_moves.pop()
                 if current_move.state not in ('done', 'cancel') and \
@@ -505,8 +505,12 @@ class ReturnProductBarcode(models.TransientModel):
             invoice_origin = invoices[0]
             if picking.picking_type_code == 'incoming':
                 refund_invoice_type = 'in_refund'
+                uom_id = line_return.product_id.uom_po_id and \
+                    line_return.product_id.uom_po_id.id
             else:
                 refund_invoice_type = 'out_refund'
+                uom_id = line_return.product_id.uom_id and \
+                    line_return.product_id.uom_id.id
 
             refund_invoice_data = {
                 'type': refund_invoice_type,
@@ -538,6 +542,9 @@ class ReturnProductBarcode(models.TransientModel):
 
             product_price_unit = purchase_product_line[0].price_unit
 
+            uom_id = line_return.product_id.uom_po_id and \
+                line_return.product_id.uom_po_id.id
+
         elif picking.picking_type_code == 'outgoing' and \
                 picking.sale_id:
 
@@ -553,6 +560,9 @@ class ReturnProductBarcode(models.TransientModel):
             )
 
             product_price_unit = sale_product_line[0].price_unit
+
+            uom_id = line_return.product_id.uom_id and \
+                line_return.product_id.uom_id.id
 
         refund_invoice = AccountInvoice.create(refund_invoice_data)
 
@@ -578,6 +588,7 @@ class ReturnProductBarcode(models.TransientModel):
             'partner_id': refund_invoice.partner_id.id,
             'account_id': invoice_line_account_id,
             'invoice_line_tax_ids': invoice_line_taxes_id,
+            'uom_id': uom_id,
         })
 
         refund_invoice.compute_taxes()
@@ -609,9 +620,11 @@ class ReturnProductBarcode(models.TransientModel):
             if line_return_stored:
                 line_return_stored.write({'completed': True})
 
-            self._create_refund_invoice(line_return)
-            if line_return.reason_return_cat_type == 'return_supplier':
-                self._create_refund_invoice(line_return, return_supplier=True)
+            if line_return.reason_return_cat_type != 'no_accepted':
+                self._create_refund_invoice(line_return)
+                if line_return.reason_return_cat_type == 'return_supplier':
+                    self._create_refund_invoice(
+                        line_return, return_supplier=True)
 
             if str(line_return.reason_return_id.category_id.id) \
                not in total_returns_category:
