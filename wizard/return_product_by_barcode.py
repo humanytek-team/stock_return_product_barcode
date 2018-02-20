@@ -319,9 +319,9 @@ class ReturnProductBarcode(models.TransientModel):
 
         # Cancel assignment of existing chained assigned moves
         moves_to_unreserve = []
-        for move in picking.move_lines:
+        for move_line in picking.move_lines:
             to_check_moves = [
-                move.move_dest_id] if move.move_dest_id.id else []
+                move_line.move_dest_id] if move_line.move_dest_id else []
             while to_check_moves:
                 current_move = to_check_moves.pop()
                 if current_move.state not in ('done', 'cancel') and \
